@@ -1,0 +1,261 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--    <parent>-->
+    <!--        <groupId>io.confluent</groupId>-->
+    <!--        <artifactId>rest-utils-parent</artifactId>-->
+    <!--        <version>5.3.0</version>-->
+    <!--    </parent>-->
+    <!--    -->
+    <groupId>Appointment</groupId>
+    <artifactId>medical-appointments</artifactId>
+    <version>5.3.0</version>
+
+    <packaging>jar</packaging>
+    <properties>
+        <!-- Keep versions as properties to allow easy modification -->
+        <avro.version>1.8.2</avro.version>
+        <confluent.version>5.3.0</confluent.version>
+        <kafka.version>5.3.0-ccs</kafka.version>
+        <!-- Maven properties for compilation -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <name>Confluent</name>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>confluent</id>
+            <url>https://packages.confluent.io/maven/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencies>
+        <!-- Add the Kafka dependencies -->
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-avro-serializer</artifactId>
+            <version>${confluent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-streams-avro-serde</artifactId>
+            <version>${confluent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>monitoring-interceptors</artifactId>
+            <version>${confluent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>${avro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+
+        <!-- Every child project uses slf4j/log4j for logging, might as well just include them here automatically -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.29</version>
+            <!--            <scope>test</scope>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.29</version>
+            <!--            <scope>test</scope>-->
+        </dependency>
+
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.5</version>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+
+
+        <plugins>
+
+            <plugin>
+                <!-- Set the Java target version to 1.8 -->
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro-maven-plugin</artifactId>
+                <version>${avro.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>schema</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>
+                                ${project.basedir}/src/main/resources/avro/com/chethanuk/appointment/
+                            </sourceDirectory>
+                            <includes>
+                                <include>appointment-v0.avsc</include>
+                                <include>appointment-flatten-v1.avsc</include>
+                            </includes>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!--
+                Add Scala sources and tests to project.
+                See http://www.mojohaus.org/build-helper-maven-plugin/usage.html
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/scala</source>
+                                <source>${project.build.directory}/generated-sources</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/scala</source>
+                                <source>${project.build.directory}/generated-sources</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry-maven-plugin</artifactId>
+                <version>5.3.0</version>
+                <configuration>
+                    <schemaRegistryUrls>
+                        <param>http://10.160.0.48:8081</param>
+                    </schemaRegistryUrls>
+                    <subjects>
+                        <transactions-value>
+                            src/main/resources/avro/com/chethanuk/appointment/appointment-v1.avsc
+                        </transactions-value>
+                    </subjects>
+                </configuration>
+                <goals>
+                    <goal>test-compatibility</goal>
+                </goals>
+            </plugin>
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-checkstyle-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <skip>true</skip>-->
+            <!--                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>-->
+            <!--                </configuration>-->
+            <!--                <executions>-->
+            <!--                    &lt;!&ndash;-->
+            <!--                     Declare our own during "test-compile".-->
+
+            <!--                     Avro codegen runs during compile, and while it's not strictly a precondition, it's-->
+            <!--                     confusing to address style violations while the IDE is telling you-->
+            <!--                     that some generated class doesn't exist.-->
+
+            <!--                     Test-compile is the first phase that's guaranteed to run after compile and before any unit or integration-->
+            <!--                     tests. &ndash;&gt;-->
+            <!--                    <execution>-->
+            <!--                        <id>validate</id>-->
+            <!--                        <phase>none</phase>-->
+            <!--                        <configuration>-->
+            <!--                            <skip>true</skip>-->
+            <!--                            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                    <execution>-->
+            <!--                        <id>test-compile</id>-->
+            <!--                        <phase>test-compile</phase>-->
+            <!--                        <configuration>-->
+            <!--                            <encoding>UTF-8</encoding>-->
+            <!--                            <consoleOutput>true</consoleOutput>-->
+            <!--                            <failsOnError>true</failsOnError>-->
+            <!--                            <failOnViolation>true</failOnViolation>-->
+            <!--                            <includeResources>false</includeResources>-->
+            <!--                            <includeTestResources>false</includeTestResources>-->
+            <!--                            <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+            <!--                            <configLocation>checkstyle.xml</configLocation>-->
+            <!--                            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>-->
+            <!--                        </configuration>-->
+            <!--                        <goals>-->
+            <!--                            <goal>check</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+
+            <!--                </executions>-->
+            <!--            </plugin>-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.12.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.7.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

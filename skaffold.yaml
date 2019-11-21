@@ -1,0 +1,26 @@
+apiVersion: skaffold/v1beta15
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  # defines where to find the code at build time and where to push the resulting image
+  artifacts:
+    - image: appointment-events
+      # Jib builds Java containers: https://github.com/GoogleContainerTools/jib
+      jib: {}
+
+# defines the Kubernetes manifests to deploy on each run
+deploy:
+  kubectl:
+    manifests:
+      - ./kubernetes-manifests/**.yaml
+profiles:
+  # Using the cloudbuild profile to build images using Google Cloud Build
+  - name: cloudbuild
+    build:
+      googleCloudBuild: {}
+  # Using .Dockerfile to build images using Docker instead of Jib
+  - name: dockerfile
+    build:
+      artifacts:
+        - image: appointment-events

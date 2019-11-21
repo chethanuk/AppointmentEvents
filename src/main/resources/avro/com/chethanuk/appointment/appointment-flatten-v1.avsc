@@ -1,0 +1,33 @@
+{
+    "name": "AppointmentFlattened",
+    "type": "record",
+    "namespace": "com.chethanuk.appointment",
+    "fields": [
+        {
+            "name": "Type",
+            "type": "string",
+            "doc": "Current state of an appointment. Ex: AppointmentBooked"
+        },
+        {
+            "name": "AppointmentId",
+            "type": "string",
+            "doc":"Unique Id associated with each Appointment"
+        },
+        {
+            "name": "TimestampUtc",
+            "type" : "long",
+            "logicalType" : "timestamp-millis",
+            "default": -1,
+            "doc": "Unix epoch Time in seconds"
+        },
+        {
+            "name": "Discipline",
+            "type": {
+                "type": "array",
+                "items": "string"
+            },
+            "default": [],
+            "doc": "Discipline of Appointment. Example: Physio"
+       }
+    ]
+}

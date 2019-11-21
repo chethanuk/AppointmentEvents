@@ -1,0 +1,33 @@
+{
+    "name": "Appointment",
+    "type": "record",
+    "namespace": "com.chethanuk.appointment",
+    "fields": [
+        {
+            "name": "Type",
+            "type": "string",
+            "doc": "Current state of an appointment. Ex: AppointmentBooked"
+        },
+        {
+            "name": "Data",
+            "type": {
+                "name": "Data",
+                "type": "record",
+                "fields": [
+                    {
+                        "name": "AppointmentId",
+                        "type": "string",
+                        "doc":"Unique Id associated with each Appointment"
+                    },
+                    {
+                        "name": "TimestampUtc",
+                        "type" : "long",
+                        "default": -1,
+                        "doc" : "Unix epoch Time in seconds"
+                    }
+                ]
+            },
+            "doc": "contain core Data fields of Appointment"
+        }
+    ]
+}

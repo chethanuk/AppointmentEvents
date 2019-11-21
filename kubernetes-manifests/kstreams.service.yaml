@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-kafka-streams-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: java-kafka-streams
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8888

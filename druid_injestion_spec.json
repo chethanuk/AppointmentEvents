@@ -1,0 +1,44 @@
+{
+  "type": "kafka",
+  "ioConfig": {
+    "type": "kafka",
+    "consumerProperties": {
+      "bootstrap.servers": "10.160.0.48:9092"
+    },
+    "topic": "appointments_stream"
+  },
+  "tuningConfig": {
+    "type": "kafka"
+  },
+  "dataSchema": {
+    "dataSource": "appointments",
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "queryGranularity": "NONE",
+      "rollup": false
+    },
+    "parser": {
+      "type": "string",
+      "parseSpec": {
+        "format": "json",
+        "timestampSpec": {
+          "column": "TimestampUtc",
+          "format": "millis"
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+            "AppointmentId",
+            "Discipline",
+            {
+              "type": "long",
+              "name": "TimestampUtc",
+              "outputName": "timestamp"
+            },
+            "Type"
+          ]
+        }
+      }
+    }
+  }
+}
